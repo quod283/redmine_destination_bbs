@@ -1,0 +1,19 @@
+# Japanese translations for Ruby on Rails
+ja:
+  field_user_name: "ユーザー名"
+  field_destination: "行先"
+  field_start_time: "開始時刻"
+  field_end_time: "終了時刻"
+  field_registration_date: "日付"
+
+  button_home: "在宅"
+  button_attendance: "出社"
+  button_business_trip: "出張"
+  button_holiday: "年休"
+  button_registration_date: "検索"
+  button_leaving: "退勤"
+
+  datetime:
+    formats:
+      default: "%H:%M"
+      time: "%H:%M"
