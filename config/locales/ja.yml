@@ -1,10 +1,14 @@
 # Japanese translations for Ruby on Rails
 ja:
+  title_destination_bbs: "行先掲示板"
+
   field_user_name: "ユーザー名"
   field_destination: "行先"
   field_start_time: "開始時刻"
   field_end_time: "終了時刻"
   field_registration_date: "日付"
+
+  filed_comment_input_field: "コメント入力欄"
 
   button_home: "在宅"
   button_attendance: "出社"
@@ -13,7 +17,4 @@ ja:
   button_registration_date: "検索"
   button_leaving: "退勤"
 
-  datetime:
-    formats:
-      default: "%H:%M"
-      time: "%H:%M"
+  button_comment_update: "コメント更新"

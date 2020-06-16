@@ -1,27 +1,16 @@
-<h2>行先掲示板</h2>
+<h2><%= l(:title_destination_bbs) %></h2>
 <h2><%= @search_params_date %></h2>
 <% if (@destination_bbs_id.blank?) %>
     <%= button_to l(:button_home), {controller: 'redmine_destination_bbs_controller', action: 'create'}, {params: {destination: l(:button_home), user_id: @user_id, start_time: Time.zone.now}} %>
+    <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs_controller', action: 'create'}, {params: {destination: l(:button_attendance), user_id: @user_id, start_time: Time.zone.now}} %>
+    <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs_controller', action: 'create'}, {params: {destination: l(:button_business_trip), user_id: @user_id, start_time: Time.zone.now}} %>
+    <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs_controller', action: 'create'}, {params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
 <% else %>
     <%= button_to l(:button_home), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_home), user_id: @user_id}} %>
-<% end %>
-
-<% if (@destination_bbs_id.blank?) %>
-    <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs_controller', action: 'create'}, {params: {destination: l(:button_attendance), user_id: @user_id, start_time: Time.zone.now}} %>
-<% else %>
     <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_attendance), user_id: @user_id}} %>
-<% end %>
-
-<% if (@destination_bbs_id.blank?) %>
-    <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs_controller', action: 'create'}, {params: {destination: l(:button_business_trip), user_id: @user_id, start_time: Time.zone.now}} %>
-<% else %>
-    <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_business_trip), user_id: @user_id}} %>
-<% end %>
-
-<% if (@destination_bbs_id.blank?) %>
-    <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs_controller', action: 'create'}, {params: {destination: l(:button_holiday), user_id: @user_id}} %>
-<% else %>
-    <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_holiday), user_id: @user_id}} %>
+    <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_business_trip), user_id: @user_id}} %>    
+    <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
+    <%= button_to l(:button_leaving), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_leaving), user_id: @user_id, end_time: Time.zone.now}} %>
 <% end %>
 
 <%= form_with(scope: :search, url:  {controller: 'redmine_destination_bbs_controller', action: 'index'}, method: :get, local: true) do |f| %>
@@ -32,9 +21,13 @@
 
 <% if (@destination_bbs_id.blank?) %>
 <% else %>
-    <%= button_to l(:button_leaving), {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_leaving), user_id: @user_id, end_time: Time.now}} %>
+    <%= form_with(url: {controller: 'redmine_destination_bbs_controller', action: 'update', id: @destination_bbs_id}, method: :put, local: true) do |f| %>
+        <%= f.text_field(:comment, placeholder: l(:filed_comment_input_field)) %>
+        <%= f.hidden_field(:user_id, value: @user_id) %>
+        <%= f.hidden_field(:registration_date, value: @search_params_date) %>
+        <%= f.submit(l(:button_comment_update)) %>
+    <% end %>
 <% end %>
-
 
 <% if (@destination_bbs.blank?) %>
     <p class="nodata"><%= l(:label_no_data) %></p>
@@ -49,8 +42,8 @@
             <tr class="<%= cycle('odd', 'even') %>">
             <td><%= @users.find(destination_bbs.user_id) %></td>
             <td><%= destination_bbs.destination %></td>
-            <td><%= l(destination_bbs.start_time.to_time) %></td> 
-            <td><%= l(destination_bbs.end_time.to_time)  if destination_bbs.end_time.present? %></td> 
+            <td><%= destination_bbs.start_time.to_time.to_s(:time) if destination_bbs.start_time.present? %></td> 
+            <td><%= destination_bbs.end_time.to_time.to_s(:time)  if destination_bbs.end_time.present? %></td> 
             <td><%= destination_bbs.comment %></td>
             </tr>
         <% end %>
