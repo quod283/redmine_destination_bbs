@@ -1,6 +1,6 @@
 Redmine::Plugin.register :redmine_destination_bbs do
   name 'Redmine Destination BBS plugin'
-  author 'Trial Taro'
+  author 'quod283'
   description 'This is a plugin for Redmine'
   version '0.0.2'
   url ''
