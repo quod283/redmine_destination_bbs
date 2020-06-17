@@ -51,3 +51,9 @@
 
     </table>
 <% end %>
+
+<%= form_with(url: {controller: 'redmine_destination_bbs_controller', action: 'index', format: :csv}, method: :get, local: true) do |f| %>
+    <%= f.hidden_field(:registration_date, value: @search_params_date) %>
+    <%= f.submit(l(:button_csv_download)) %>
+<% end %>
+

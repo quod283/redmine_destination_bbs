@@ -17,4 +17,5 @@ en:
   button_registration_date: "Move"
   button_leaving: "退勤"
 
-  button_comment_update: "comment_update"
+  button_comment_update: "Comment Update"
+  button_csv_download: "CSV Download"
