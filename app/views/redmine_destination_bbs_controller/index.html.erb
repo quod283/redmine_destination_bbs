@@ -34,7 +34,7 @@
 <% else %>
     <table class="list">
         <thead><tr>  
-        <th><%=h l(:field_user_name) %></th><th><%=h l(:field_destination) %></th><th><%=h l(:field_start_time) %></th><th><%=h l(:field_end_time) %></th><th><%=h l(:field_comments) %></th>
+        <th><%=h l(:field_user_name) %></th><th><%=h l(:field_destination) %></th><th><%=h l(:field_start_time) %></th><th><%=h l(:field_end_time) %></th><th><%=h l(:field_working_in_place)%></th><th><%=h l(:field_comments) %></th>
         </tr></thead>
 
         <tbody>
@@ -43,7 +43,8 @@
             <td><%= @users.find(destination_bbs.user_id) %></td>
             <td><%= destination_bbs.destination %></td>
             <td><%= destination_bbs.start_time.to_time.to_s(:time) if destination_bbs.start_time.present? %></td> 
-            <td><%= destination_bbs.end_time.to_time.to_s(:time)  if destination_bbs.end_time.present? %></td> 
+            <td><%= destination_bbs.end_time.to_time.to_s(:time)  if destination_bbs.end_time.present? %></td>
+            <td><%= @custom_values.where(customized_id: destination_bbs.user_id).select('value').first %></td>
             <td><%= destination_bbs.comment %></td>
             </tr>
         <% end %>

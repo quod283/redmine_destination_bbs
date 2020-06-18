@@ -8,6 +8,7 @@ ja:
   field_end_time: "終了時刻"
   field_registration_date: "日付"
 
+  field_working_in_place: "在勤地"
   filed_comment_input_field: "コメント入力欄"
 
   button_home: "在宅"

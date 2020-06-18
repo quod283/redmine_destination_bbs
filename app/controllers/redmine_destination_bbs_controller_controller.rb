@@ -3,6 +3,15 @@ class RedmineDestinationBbsControllerController < ApplicationController
   def index
     # ユーザーID→名前変換用データ取得
     @users = User.select('id', 'lastname', 'firstname')
+    # 在勤地情報の取得
+    custom_field_id = CustomField.where(name: l(:field_working_in_place)).select('id')
+    @custom_values = CustomValue.where(customized_type: 'Principal', custom_field_id: custom_field_id).select('customized_id', 'value')
+
+    # # グループ名・ID取得
+    # @groups = User.where(type: 'Group').select('id', 'lastname')
+    # # グループIDとユーザーIDの対応取得
+    # @groups_users = GroupUser.all
+
     # フォーマット毎に処理を分ける
     respond_to do |format|
       format.html do
@@ -17,10 +26,12 @@ class RedmineDestinationBbsControllerController < ApplicationController
           @destination_bbs = RedmineDestinationBbsModel.search(@search_params)
           @search_params_date = @search_params[:registration_date]
         end
+
         # 登録用ユーザーIDの取得
         @user_id = User.current.attributes["id"]
         # 登録済レコードのID取得
         @destination_bbs_id = RedmineDestinationBbsModel.where(user_id: @user_id, registration_date: @search_params[:registration_date]).select('id')
+        
       end
       format.csv do
         if params[:registration_date].blank?

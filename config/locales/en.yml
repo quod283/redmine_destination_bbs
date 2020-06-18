@@ -8,6 +8,7 @@ en:
   field_end_time: "End Time"
   field_registration_date: "Date"
 
+  field_working_in_place: "Working in Place"
   filed_comment_input_field: "Comment Input Field"
 
   button_home: "在宅"
