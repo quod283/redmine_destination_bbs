@@ -32,6 +32,9 @@ class RedmineDestinationBbsControllerController < ApplicationController
         # 登録済レコードのID取得
         @destination_bbs_id = RedmineDestinationBbsModel.where(user_id: @user_id, registration_date: @search_params[:registration_date]).select('id')
         
+        # ユーザー一覧表示用
+        @users_list = get_user_list
+
       end
       format.csv do
         if params[:registration_date].blank?
@@ -39,6 +42,8 @@ class RedmineDestinationBbsControllerController < ApplicationController
         else
           @destination_bbs = RedmineDestinationBbsModel.where(registration_date: params[:registration_date])
         end
+        # ユーザー一覧表示用
+        @users_list = get_user_list
         send_data render_to_string, filename: "destination_bbs.csv", type: :csv
       end
     end
@@ -109,8 +114,15 @@ class RedmineDestinationBbsControllerController < ApplicationController
 
   private
 
+  # indexリダイレクト用
   def move_to_index
     redirect_back(fallback_location: {:controller => 'redmine_destination_bbs_controller', :action => 'index'})
+  end
+
+  # ユーザー一覧表示用
+  def get_user_list
+    query = @destination_bbs.select(:user_id)
+    User.where.not id: query, type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"]
   end
 
   # 日付指定時の検索用関数
