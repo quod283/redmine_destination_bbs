@@ -4,7 +4,7 @@ class RedmineDestinationBbsControllerController < ApplicationController
     # ユーザーID→名前変換用データ取得
     @users = User.select('id', 'lastname', 'firstname')
     # 在勤地情報の取得
-    custom_field_id = CustomField.where(name: l(:field_working_in_place)).select('id')
+    custom_field_id = CustomField.where(name: "在勤地").select('id')
     @custom_values = CustomValue.where(customized_type: 'Principal', custom_field_id: custom_field_id).select('customized_id', 'value')
 
     # # グループ名・ID取得
