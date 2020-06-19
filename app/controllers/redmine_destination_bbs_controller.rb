@@ -1,4 +1,4 @@
-class RedmineDestinationBbsControllerController < ApplicationController
+class RedmineDestinationBbsController < ApplicationController
   unloadable
   def index
     # ユーザーID→名前変換用データ取得
@@ -116,7 +116,7 @@ class RedmineDestinationBbsControllerController < ApplicationController
 
   # indexリダイレクト用
   def move_to_index
-    redirect_back(fallback_location: {:controller => 'redmine_destination_bbs_controller', :action => 'index'})
+    redirect_back(fallback_location: {:controller => 'redmine_destination_bbs', :action => 'index'})
   end
 
   # ユーザー一覧表示用

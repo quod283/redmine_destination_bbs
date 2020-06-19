@@ -1,0 +1,2 @@
+module RedmineDestinationBbsHelper
+end
