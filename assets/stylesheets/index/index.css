@@ -1,0 +1,17 @@
+table.list{
+    table-layout: fixed;
+    width: 100%;
+}
+
+.destination_bbs_table th {
+    color: darkslategray;
+}
+
+
+.comment_header {
+    width: 40%;
+}
+
+.comment_body {
+    width: 40%;
+}

@@ -1,3 +1,5 @@
+<%= stylesheet_link_tag "index/index.css", :plugin => 'redmine_destination_bbs' %>
+
 <h2><%= l(:title_destination_bbs) %></h2>
 <h2><%= @search_params_date %></h2>
 <% if (@destination_bbs_id.blank?) %>
@@ -22,17 +24,19 @@
 <% if (@destination_bbs_id.blank?) %>
 <% else %>
     <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, method: :put, local: true) do |f| %>
-        <%= f.text_field(:comment, placeholder: l(:filed_comment_input_field)) %>
+        <%= f.text_field(:comment, placeholder: l(:filed_comment_input_field), :size => 80) %>
         <%= f.hidden_field(:user_id, value: @user_id) %>
         <%= f.hidden_field(:registration_date, value: @search_params_date) %>
         <%= f.submit(l(:button_comment_update)) %>
     <% end %>
 <% end %>
 
+<%= link_to(l(:button_weekly_information), report_redmine_destination_bbs_path, method: :get) %>
 
 <table class="list">
-    <thead><tr>  
-    <th><%=h l(:field_user_name) %></th><th><%=h l(:field_destination) %></th><th><%=h l(:field_start_time) %></th><th><%=h l(:field_end_time) %></th><th><%=h l(:field_working_in_place)%></th><th><%=h l(:field_comments) %></th>
+    <thead><tr>
+    <th><%=h l(:field_user_name) %></th><th><%=h l(:field_destination) %></th><th><%=h l(:field_start_time) %></th><th><%=h l(:field_end_time) %></th>
+    <th><%=h l(:field_working_in_place)%></th><th class="comment_header"><%=h l(:field_comments) %></th>
     </tr></thead>
 
     <tbody>
@@ -45,7 +49,7 @@
             <td><%= destination_bbs.start_time.to_time.to_s(:time) if destination_bbs.start_time.present? %></td> 
             <td><%= destination_bbs.end_time.to_time.to_s(:time)  if destination_bbs.end_time.present? %></td>
             <td><%= @custom_values.where(customized_id: destination_bbs.user_id).select('value').first %></td>
-            <td><%= destination_bbs.comment %></td>
+            <td class="comment_body"><%= destination_bbs.comment %></td>
             </tr>
         <% end %>
     <% end %>
@@ -56,7 +60,7 @@
         <td></td>
         <td></td>
         <td><%= @custom_values.where(customized_id: user.id).select('value').first%></td>
-        <td></td>
+        <td class="comment_body"></td>
         </tr>
     <% end %>
     </tbody>

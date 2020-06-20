@@ -4,13 +4,12 @@ class RedmineDestinationBbsController < ApplicationController
     # ユーザーID→名前変換用データ取得
     @users = User.select('id', 'lastname', 'firstname')
     # 在勤地情報の取得
-    custom_field_id = CustomField.where(name: "在勤地").select('id')
-    @custom_values = CustomValue.where(customized_type: 'Principal', custom_field_id: custom_field_id).select('customized_id', 'value')
+    @custom_values = get_working_in_place
 
     # # グループ名・ID取得
     # @groups = User.where(type: 'Group').select('id', 'lastname')
     # # グループIDとユーザーIDの対応取得
-    # @groups_users = GroupUser.all
+    # @groups_users = Group.all
 
     # フォーマット毎に処理を分ける
     respond_to do |format|
@@ -29,7 +28,7 @@ class RedmineDestinationBbsController < ApplicationController
 
         # 登録用ユーザーIDの取得
         @user_id = User.current.attributes["id"]
-        # 登録済レコードのID取得
+        # 本人登録済レコードのID取得
         @destination_bbs_id = RedmineDestinationBbsModel.where(user_id: @user_id, registration_date: @search_params[:registration_date]).select('id')
         
         # ユーザー一覧表示用
@@ -112,6 +111,27 @@ class RedmineDestinationBbsController < ApplicationController
     end
   end
 
+  # 週間情報表示用
+  def report
+    # 週間情報取得
+    @beginning_of_week = Date.today.beginning_of_week
+    @next_week = Date.today.next_week(day= :monday)
+    @destination_bbs_to_report = RedmineDestinationBbsModel.select('user_id', 'registration_date', 'destination')
+    # ユーザー情報取得
+    @users_to_report = User.where.not type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"]
+    # 在勤地情報取得
+    @custom_values = get_working_in_place
+    
+    respond_to do |format|
+      format.html do
+      end
+      format.csv do
+        send_data render_to_string, filename: "destination_weekly_report.csv", type: :csv
+      end
+    end
+  end
+
+
   private
 
   # indexリダイレクト用
@@ -123,6 +143,12 @@ class RedmineDestinationBbsController < ApplicationController
   def get_user_list
     query = @destination_bbs.select(:user_id)
     User.where.not id: query, type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"]
+  end
+
+  # 在勤地情報取得
+  def get_working_in_place
+    custom_field_id = CustomField.where(name: "在勤地").select('id')
+    CustomValue.where(customized_type: 'Principal', custom_field_id: custom_field_id).select('customized_id', 'value')
   end
 
   # 日付指定時の検索用関数
