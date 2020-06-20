@@ -1,5 +1,7 @@
 class RedmineDestinationBbsController < ApplicationController
   unloadable
+  accept_api_auth :index
+
   def index
     # ユーザーID→名前変換用データ取得
     @users = User.select('id', 'lastname', 'firstname')
@@ -44,6 +46,13 @@ class RedmineDestinationBbsController < ApplicationController
         # ユーザー一覧表示用
         @users_list = get_user_list
         send_data render_to_string, filename: "destination_bbs.csv", type: :csv
+      end
+      format.api do
+        if params[:registration_date].blank?
+          @destination_bbs = RedmineDestinationBbsModel.all
+        else
+          @destination_bbs = RedmineDestinationBbsModel.where(registration_date: params[:registration_date])
+        end
       end
     end
   end
