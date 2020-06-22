@@ -3,28 +3,58 @@ class RedmineDestinationBbsController < ApplicationController
   accept_api_auth :index
 
   def index
+
+    # 検索(日付・グループ)
+    @search_params = destination_bbs_search_params
+
+    # グループ名・ID取得
+    @groups = User.where(type: 'Group').select('id', 'lastname')
+
     # ユーザーID→名前変換用データ取得
     @users = User.select('id', 'lastname', 'firstname')
     # 在勤地情報の取得
     @custom_values = get_working_in_place
 
-    # # グループ名・ID取得
-    # @groups = User.where(type: 'Group').select('id', 'lastname')
-    # # グループIDとユーザーIDの対応取得
-    # @groups_users = Group.all
+    # グループ名取得
+    scope = Group.sorted.where(type: 'Group')
+    @groups = scope.to_a
 
     # フォーマット毎に処理を分ける
     respond_to do |format|
       format.html do
-        # 日付を検索
-        @search_params = destination_bbs_search_params
-        # 日付欄が空欄の場合(初期表示時)は表示時点の日付データを取得する
-        if @search_params.blank?
-          @destination_bbs = RedmineDestinationBbsModel.where(registration_date: Date.today)
-          @search_params_date = Date.today
-          @search_params[:registration_date] = Date.today
+        # グループすべて選択時
+        if @search_params[:group_id].blank? || @search_params[:group_id] == l(:select_all)
+          group_id_list = []
+          @groups.each do |g|
+            group_id_list << g.id
+          end
+          @search_params[:group_id] = group_id_list
+          @select_group_id = l(:select_all)
         else
-          @destination_bbs = RedmineDestinationBbsModel.search(@search_params)
+          @select_group_id = @search_params[:group_id]
+        end
+        # グループ検索用
+        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: @search_params[:group_id]}) if @search_params[:group_id].present?
+        group_user_id_list = []
+        if @search_group_users.blank?
+        else
+          @search_group_users.each do |group_user|
+            group_user_id_list << group_user.id
+          end
+        end
+        # 日付欄が空欄の場合(初期表示時)は表示時点の日付データを取得する
+        if @search_params[:registration_date].blank?
+          if params[:registration_date].blank?
+            @destination_bbs = RedmineDestinationBbsModel.where(registration_date: Date.today, user_id: group_user_id_list)
+            @search_params[:registration_date] = Date.today
+            @search_params_date = Date.today
+          else
+            @destination_bbs = RedmineDestinationBbsModel.where(registration_date:  params[:registration_date], user_id: group_user_id_list)
+            @search_params[:registration_date] = params[:registration_date]
+            @search_params_date = params[:registration_date]
+          end
+        else
+          @destination_bbs = RedmineDestinationBbsModel.search(@search_params).where(user_id: group_user_id_list)
           @search_params_date = @search_params[:registration_date]
         end
 
@@ -32,24 +62,60 @@ class RedmineDestinationBbsController < ApplicationController
         @user_id = User.current.attributes["id"]
         # 本人登録済レコードのID取得
         @destination_bbs_id = RedmineDestinationBbsModel.where(user_id: @user_id, registration_date: @search_params[:registration_date]).select('id')
-        
-        # ユーザー一覧表示用
-        @users_list = get_user_list
-
+        # グループユーザー一覧表示用
+        if @search_group_users.blank?
+          @search_group_users_list = ''
+        else
+          @search_group_users_list = get_group_user_list(@destination_bbs)
+        end
       end
       format.csv do
-        if params[:registration_date].blank?
-          @destination_bbs = RedmineDestinationBbsModel.all
+        # グループすべて選択時
+        if params[:group_id].blank? || params[:group_id] == l(:select_all)
+          group_id_list = []
+          @groups.each do |g|
+            group_id_list << g.id
+          end
+          params[:group_id] = group_id_list
+          @select_group_id = l(:select_all)
         else
-          @destination_bbs = RedmineDestinationBbsModel.where(registration_date: params[:registration_date])
+          @select_group_id = params[:group_id]
         end
-        # ユーザー一覧表示用
-        @users_list = get_user_list
+        # グループ検索用
+        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: params[:group_id]}) if params[:group_id].present?
+        group_user_id_list = []
+        if @search_group_users.blank?
+        else
+          @search_group_users.each do |group_user|
+            group_user_id_list << group_user.id
+          end
+        end
+
+        if params[:registration_date].blank?
+          if params[:group_id].blank? || params[:group_id] == l(:select_all)
+            @destination_bbs = RedmineDestinationBbsModel.all
+          else
+            @destination_bbs = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
+          end
+        else
+          if params[:group_id].blank? || params[:group_id] == l(:select_all)
+            @destination_bbs = RedmineDestinationBbsModel.where(registration_date: params[:registration_date])
+          else
+            @destination_bbs = RedmineDestinationBbsModel.where(registration_date: params[:registration_date], user_id: group_user_id_list)
+          end
+        end
+        # グループユーザー一覧表示用
+        if @search_group_users.blank?
+          @search_group_users_list = ''
+        else
+          @search_group_users_list = get_group_user_list(@destination_bbs)
+        end
         send_data render_to_string, filename: "destination_bbs.csv", type: :csv
       end
       format.api do
+        @users_list = User.select('id').where.not type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"], status: [0, 2, 3]
         if params[:registration_date].blank?
-          @destination_bbs = RedmineDestinationBbsModel.all
+          @destination_bbs = RedmineDestinationBbsModel.where(user_id: @users_list)
         else
           @destination_bbs = RedmineDestinationBbsModel.where(registration_date: params[:registration_date])
         end
@@ -101,7 +167,7 @@ class RedmineDestinationBbsController < ApplicationController
       else
         # 退勤ボタンを押した時のみ終了時刻を更新
         if params[:end_time].present?
-          if @destination_bbs.update(destination: params[:destination], end_time: params[:end_time])
+          if @destination_bbs.update(end_time: params[:end_time])
             flash[:notice] = l(:notice_successful_update)
             move_to_index
           end
@@ -122,22 +188,73 @@ class RedmineDestinationBbsController < ApplicationController
 
   # 週間情報表示用
   def report
+    # 検索(日付・グループ)
+    @search_params = destination_bbs_search_params
     # 週間情報取得
     @beginning_of_week = Date.today.beginning_of_week
     @next_week = Date.today.next_week(day= :monday)
-    @destination_bbs_to_report = RedmineDestinationBbsModel.select('user_id', 'registration_date', 'destination')
-    # ユーザー情報取得
-    @users_to_report = User.where.not type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"], status: [0, 2, 3]
+
+    # グループ名取得
+    scope = Group.sorted.where(type: 'Group')
+    @groups = scope.to_a
+
     # 在勤地情報取得
     @custom_values = get_working_in_place
-    
+
+    # 曜日配列
+    @weekday_list = %w((日) (月) (火) (水) (木) (金) (土))
+
     respond_to do |format|
       format.html do
+        # グループすべて選択時
+        if @search_params[:group_id].blank? || @search_params[:group_id] == l(:select_all)
+          group_id_list = []
+          @groups.each do |g|
+            group_id_list << g.id
+          end
+          @search_params[:group_id] = group_id_list
+          @select_group_id = l(:select_all)
+        else
+          @select_group_id = @search_params[:group_id]
+        end
+        # グループ検索用
+        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: @search_params[:group_id] }) if @search_params[:group_id].present?
+        # グループユーザー一覧表示用
+        group_user_id_list = []
+        if @search_group_users.blank?
+        else
+          @search_group_users.each do |group_user|
+            group_user_id_list << group_user.id
+          end
+        end
+        @destination_bbs_to_report = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
       end
       format.csv do
-        send_data render_to_string, filename: "destination_weekly_report.csv", type: :csv
+        # グループすべて選択時
+        if params[:group_id].blank? || params[:group_id] == l(:select_all)
+          group_id_list = []
+          @groups.each do |g|
+            group_id_list << g.id
+          end
+          params[:group_id] = group_id_list
+          @select_group_id = l(:select_all)
+        else
+          @select_group_id = params[:group_id]
+        end
+        # グループ検索用
+        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: params[:group_id] }) if params[:group_id].present?
+        # グループユーザー一覧表示用
+        group_user_id_list = []
+        if @search_group_users.blank?
+        else
+          @search_group_users.each do |group_user|
+            group_user_id_list << group_user.id
+          end
+        end
+          @destination_bbs_to_report = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
+          send_data render_to_string, filename: "destination_weekly_report.csv", type: :csv
+        end
       end
-    end
   end
 
 
@@ -148,10 +265,10 @@ class RedmineDestinationBbsController < ApplicationController
     redirect_back(fallback_location: {:controller => 'redmine_destination_bbs', :action => 'index'})
   end
 
-  # ユーザー一覧表示用
-  def get_user_list
-    query = @destination_bbs.select(:user_id)
-    User.where.not id: query, type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"], status: [0, 2, 3]
+  # グループユーザー一覧表示用
+  def get_group_user_list(base_model)
+    query = base_model.select(:user_id)
+    @search_group_users.where.not id: query, type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"], status: [0, 2, 3]
   end
 
   # 在勤地情報取得
@@ -162,7 +279,7 @@ class RedmineDestinationBbsController < ApplicationController
 
   # 日付指定時の検索用関数
   def destination_bbs_search_params
-    params.fetch(:search, {}).permit(:registration_date)
+    params.fetch(:search, {}).permit(:registration_date, :group_id)
   end
 
 end

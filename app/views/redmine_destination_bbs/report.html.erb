@@ -1,5 +1,11 @@
 <h2><%= l(:button_weekly_information) %></h2>
 <h2><%= @beginning_of_week.to_s + ' ~ ' + (@next_week - 1).to_s %></h2>
+
+<%= form_with(scope: :search, url: {controller: 'redmine_destination_bbs', action: 'report'}, method: :get, local: true) do |f| %>
+    <%= f.select :group_id, options_for_select(@groups.map{ |group| [group.lastname, group.id]}, @select_group_id), include_blank: l(:select_all) %>
+    <%= f.submit(l(:button_search_group)) %>
+<% end %>
+
 <%= link_to(l(:title_destination_bbs), redmine_destination_bbs_path, method: :get) %>
 
 <table class="list">
@@ -7,17 +13,17 @@
         <th><%=h l(:field_user_name) %></th>
         <th><%=h l(:field_working_in_place) %>
         <% (@beginning_of_week...@next_week).each do |date| %>
-            <th><%=h date.strftime('%m-%d') %></th>
+            <th><%=h date.strftime('%m-%d') + @weekday_list[date.wday] %></th>
         <% end %>
     </tr></thead>
 
     <tbody>
-    <% @users_to_report.each do |user|%>
+    <% @search_group_users.each do |group_user|%>
         <tr class="<%= cycle('odd', 'even') %>">
-        <td><%= user %></td>
-        <td><%= @custom_values.where(customized_id: user.id).select('value').first%></td>
+        <td><%= group_user %></td>
+        <td><%= @custom_values.where(customized_id: group_user.id).select('value').first%></td>
         <% (@beginning_of_week...@next_week).each do |date| %>
-            <% @destination_bbs_to_report.where(user_id: user.id, registration_date: date).each do |record| %>
+            <% @destination_bbs_to_report.where(user_id: group_user.id, registration_date: date).each do |record| %>
                 <td><%= record.destination %></td>
             <% end %>
         <% end %>
@@ -27,5 +33,6 @@
 </table>
 
 <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'report', format: :csv}, method: :get, local: true) do |f| %>
+    <%= f.hidden_field(:group_id, value: @select_group_id) %>
     <%= f.submit(l(:button_csv_download)) %>
 <% end %>

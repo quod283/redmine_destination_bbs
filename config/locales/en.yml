@@ -22,3 +22,7 @@ en:
   button_csv_download: "CSV Download"
 
   button_weekly_information: "Weekly Information"
+
+  button_search_group: "Search Group"
+
+  select_all: "all"

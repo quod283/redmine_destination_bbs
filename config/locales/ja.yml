@@ -22,3 +22,7 @@ ja:
   button_csv_download: "CSV出力"
 
   button_weekly_information: "週間情報"
+
+  button_search_group: "グループ検索"
+
+  select_all: "すべて"

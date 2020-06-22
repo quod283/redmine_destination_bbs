@@ -27,13 +27,13 @@ CSV.generate(bom) do |csv|
         ]
         csv << column_values
     end
-    @users_list.each do |user|
+    @search_group_users_list.each do |group_user|
         column_values = [
-            user,
+            group_user,
             '',
             '',
             '',
-            @custom_values.where(customized_id: user.id).select('value').first,
+            @custom_values.where(customized_id: group_user.id).select('value').first,
             '',
             ''
         ]

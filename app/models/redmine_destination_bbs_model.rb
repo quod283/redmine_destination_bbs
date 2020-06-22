@@ -7,5 +7,4 @@ class RedmineDestinationBbsModel < ActiveRecord::Base
         registration_date_is(search_params[:registration_date])
     end
     scope :registration_date_is, -> (registration_date) { where(registration_date: registration_date) if registration_date.present?}
-
 end
