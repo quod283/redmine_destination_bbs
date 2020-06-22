@@ -127,7 +127,7 @@ class RedmineDestinationBbsController < ApplicationController
     @next_week = Date.today.next_week(day= :monday)
     @destination_bbs_to_report = RedmineDestinationBbsModel.select('user_id', 'registration_date', 'destination')
     # ユーザー情報取得
-    @users_to_report = User.where.not type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"]
+    @users_to_report = User.where.not type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"], status: [0, 2, 3]
     # 在勤地情報取得
     @custom_values = get_working_in_place
     
@@ -151,7 +151,7 @@ class RedmineDestinationBbsController < ApplicationController
   # ユーザー一覧表示用
   def get_user_list
     query = @destination_bbs.select(:user_id)
-    User.where.not id: query, type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"]
+    User.where.not id: query, type: ["GroupAnonymous", "GroupNonMember", "AnonymousUser", "Group"], status: [0, 2, 3]
   end
 
   # 在勤地情報取得
