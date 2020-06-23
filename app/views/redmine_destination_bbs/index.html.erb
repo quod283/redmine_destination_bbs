@@ -60,9 +60,9 @@
             </tr>
         <% end %>
     <% end %>
-    <% if (@search_group_users.blank?)%>
+    <% if (@search_group_users_list_distinct.blank?)%>
     <% else %>
-        <% @search_group_users_list.each do |group_user|%>
+        <% @search_group_users_list_distinct.each do |group_user|%>
             <tr class="<%= cycle('odd', 'even') %>">
             <td><%= group_user %></td>
             <td></td>

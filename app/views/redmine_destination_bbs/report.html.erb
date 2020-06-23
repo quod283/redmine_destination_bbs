@@ -18,7 +18,7 @@
     </tr></thead>
 
     <tbody>
-    <% @search_group_users.each do |group_user|%>
+    <% @search_group_users_distinct.each do |group_user|%>
         <tr class="<%= cycle('odd', 'even') %>">
         <td><%= group_user %></td>
         <td><%= @custom_values.where(customized_id: group_user.id).select('value').first%></td>

@@ -27,7 +27,7 @@ CSV.generate(bom) do |csv|
         ]
         csv << column_values
     end
-    @search_group_users_list.each do |group_user|
+    @search_group_users_list_distinct.each do |group_user|
         column_values = [
             group_user,
             '',

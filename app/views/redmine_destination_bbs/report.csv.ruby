@@ -10,7 +10,7 @@ CSV.generate(bom) do |csv|
     end
     csv << column_names
     # 出力データ
-    @search_group_users.each do |group_user|
+    @search_group_users_distinct.each do |group_user|
         column_values =[
             group_user,
             @custom_values.where(customized_id: group_user.id).select('value').first

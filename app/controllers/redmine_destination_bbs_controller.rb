@@ -68,6 +68,7 @@ class RedmineDestinationBbsController < ApplicationController
           @search_group_users_list = ''
         else
           @search_group_users_list = get_group_user_list(@destination_bbs)
+          @search_group_users_list_distinct = @search_group_users_list.select('id', 'lastname', 'firstname').distinct
         end
       end
       format.csv do
@@ -111,6 +112,7 @@ class RedmineDestinationBbsController < ApplicationController
           @search_group_users_list = ''
         else
           @search_group_users_list = get_group_user_list(@destination_bbs)
+          @search_group_users_list_distinct = @search_group_users_list.select('id', 'lastname', 'firstname').distinct
         end
         send_data render_to_string, filename: "destination_bbs.csv", type: :csv
       end
@@ -229,6 +231,7 @@ class RedmineDestinationBbsController < ApplicationController
             group_user_id_list << group_user.id
           end
           group_user_id_list.uniq!
+          @search_group_users_distinct = @search_group_users.select('id', 'lastname', 'firstname').distinct
         end
         @destination_bbs_to_report = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
       end
@@ -254,6 +257,7 @@ class RedmineDestinationBbsController < ApplicationController
             group_user_id_list << group_user.id
           end
           group_user_id_list.uniq!
+          @search_group_users_distinct = @search_group_users.select('id', 'lastname', 'firstname').distinct
         end
           @destination_bbs_to_report = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
           send_data render_to_string, filename: "destination_weekly_report.csv", type: :csv
