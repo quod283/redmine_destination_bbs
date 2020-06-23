@@ -41,6 +41,7 @@ class RedmineDestinationBbsController < ApplicationController
           @search_group_users.each do |group_user|
             group_user_id_list << group_user.id
           end
+          group_user_id_list.uniq!
         end
         # 日付欄が空欄の場合(初期表示時)は表示時点の日付データを取得する
         if @search_params[:registration_date].blank?
@@ -89,6 +90,7 @@ class RedmineDestinationBbsController < ApplicationController
           @search_group_users.each do |group_user|
             group_user_id_list << group_user.id
           end
+          group_user_id_list.uniq!
         end
 
         if params[:registration_date].blank?
@@ -226,6 +228,7 @@ class RedmineDestinationBbsController < ApplicationController
           @search_group_users.each do |group_user|
             group_user_id_list << group_user.id
           end
+          group_user_id_list.uniq!
         end
         @destination_bbs_to_report = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
       end
@@ -250,6 +253,7 @@ class RedmineDestinationBbsController < ApplicationController
           @search_group_users.each do |group_user|
             group_user_id_list << group_user.id
           end
+          group_user_id_list.uniq!
         end
           @destination_bbs_to_report = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
           send_data render_to_string, filename: "destination_weekly_report.csv", type: :csv
