@@ -3,16 +3,24 @@
 <h2><%= l(:title_destination_bbs) %></h2>
 <h2><%= @search_params_date %></h2>
 <% if (@destination_bbs_id.blank?) %>
-    <%= button_to l(:button_home), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_home), user_id: @user_id, start_time: Time.zone.now}} %>
-    <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_attendance), user_id: @user_id, start_time: Time.zone.now}} %>
-    <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_business_trip), user_id: @user_id, start_time: Time.zone.now}} %>
-    <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
+    <% if (@search_params_date == Date.today.strftime("%Y-%m-%d") || @search_params_date == Date.today) %>
+        <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_attendance), user_id: @user_id, start_time: Time.zone.now}} %>
+        <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_business_trip), user_id: @user_id, start_time: Time.zone.now}} %>
+        <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
+        <%= button_to l(:button_home), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_home), user_id: @user_id, start_time: Time.zone.now}} %>
+    <% else %>
+        <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
+    <% end %>
 <% else %>
-    <%= button_to l(:button_home), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_home), user_id: @user_id}} %>
-    <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_attendance), user_id: @user_id}} %>
-    <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_business_trip), user_id: @user_id}} %>    
-    <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
-    <%= button_to l(:button_leaving), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_leaving), user_id: @user_id, end_time: Time.zone.now}} %>
+    <% if (@search_params_date == Date.today.strftime("%Y-%m-%d") || @search_params_date == Date.today) %>
+        <%= button_to l(:button_home), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_home), user_id: @user_id}} %>
+        <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_attendance), user_id: @user_id}} %>
+        <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_business_trip), user_id: @user_id}} %>    
+        <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
+        <%= button_to l(:button_leaving), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_leaving), user_id: @user_id, end_time: Time.zone.now}} %>
+    <% else %>
+        <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
+    <% end %>
 <% end %>
 
 <%= form_with(scope: :search, url:  {controller: 'redmine_destination_bbs', action: 'index'}, method: :get, local: true) do |f| %>
@@ -33,7 +41,7 @@
 <% end %>
 
 <%= form_with(scope: :search, url: {controller: 'redmine_destination_bbs', action: 'index'}, method: :get, local: true) do |f| %>
-    <%= f.select :group_id, options_for_select(@groups.map{ |group| [group.lastname, group.id]}, @select_group_id), include_blank: l(:select_all) %>
+    <%= f.select :group_id, options_for_select(@groups.map{ |group| [group.lastname, group.id]}.push([l(:select_all), l(:select_all)]), @select_group_id), {prompt: l(:select_my_group)} %>
     <%= f.hidden_field(:registration_date, value: @search_params_date) %>
     <%= f.submit(l(:button_search_group)) %>
 <% end %>

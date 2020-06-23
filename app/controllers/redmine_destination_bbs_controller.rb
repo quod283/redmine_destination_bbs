@@ -19,17 +19,31 @@ class RedmineDestinationBbsController < ApplicationController
     scope = Group.sorted.where(type: 'Group')
     @groups = scope.to_a
 
+    # 登録用ユーザーIDの取得
+    @user_id = User.current.attributes["id"]
+
+    # Myグループid取得
+    my_group_id_list = User.joins(:groups).where(users_groups_users_join: { user_id: @user_id}).select('group_id')
+
+
     # フォーマット毎に処理を分ける
     respond_to do |format|
       format.html do
-        # グループすべて選択時
-        if @search_params[:group_id].blank? || @search_params[:group_id] == l(:select_all)
-          group_id_list = []
+        group_id_list = []
+        # グループ「すべて」選択時
+        if @search_params[:group_id] == l(:select_all)
           @groups.each do |g|
             group_id_list << g.id
           end
           @search_params[:group_id] = group_id_list
           @select_group_id = l(:select_all)
+        # 初期表示時またはMyグループ選択時
+        elsif @search_params[:group_id].blank?
+          my_group_id_list.each do |mg|
+            group_id_list << mg.group_id
+          end
+          @search_params[:group_id] = group_id_list
+          @select_group_id = ''
         else
           @select_group_id = @search_params[:group_id]
         end
@@ -59,8 +73,6 @@ class RedmineDestinationBbsController < ApplicationController
           @search_params_date = @search_params[:registration_date]
         end
 
-        # 登録用ユーザーIDの取得
-        @user_id = User.current.attributes["id"]
         # 本人登録済レコードのID取得
         @destination_bbs_id = RedmineDestinationBbsModel.where(user_id: @user_id, registration_date: @search_params[:registration_date]).select('id')
         # グループユーザー一覧表示用
@@ -72,14 +84,20 @@ class RedmineDestinationBbsController < ApplicationController
         end
       end
       format.csv do
+        group_id_list = []
         # グループすべて選択時
-        if params[:group_id].blank? || params[:group_id] == l(:select_all)
-          group_id_list = []
+        if params[:group_id] == l(:select_all)
           @groups.each do |g|
             group_id_list << g.id
           end
           params[:group_id] = group_id_list
           @select_group_id = l(:select_all)
+        elsif params[:group_id].blank?
+          my_group_id_list.each do |mg|
+            group_id_list << mg.group_id
+          end
+          params[:group_id] = group_id_list
+          @select_group_id = ''
         else
           @select_group_id = params[:group_id]
         end
@@ -208,16 +226,27 @@ class RedmineDestinationBbsController < ApplicationController
     # 曜日配列
     @weekday_list = %w((日) (月) (火) (水) (木) (金) (土))
 
+    # ログインユーザーIDの取得
+    @user_id = User.current.attributes["id"]
+    # Myグループid取得
+    my_group_id_list = User.joins(:groups).where(users_groups_users_join: { user_id: @user_id}).select('group_id')
+
     respond_to do |format|
       format.html do
+        group_id_list = []
         # グループすべて選択時
-        if @search_params[:group_id].blank? || @search_params[:group_id] == l(:select_all)
-          group_id_list = []
+        if @search_params[:group_id] == l(:select_all)
           @groups.each do |g|
             group_id_list << g.id
           end
           @search_params[:group_id] = group_id_list
           @select_group_id = l(:select_all)
+        elsif @search_params[:group_id].blank?
+          my_group_id_list.each do |mg|
+            group_id_list << mg.group_id
+          end
+          @search_params[:group_id] = group_id_list
+          @select_group_id = ''
         else
           @select_group_id = @search_params[:group_id]
         end
@@ -236,14 +265,20 @@ class RedmineDestinationBbsController < ApplicationController
         @destination_bbs_to_report = RedmineDestinationBbsModel.where(user_id: group_user_id_list)
       end
       format.csv do
+        group_id_list = []
         # グループすべて選択時
-        if params[:group_id].blank? || params[:group_id] == l(:select_all)
-          group_id_list = []
+        if params[:group_id] == l(:select_all)
           @groups.each do |g|
             group_id_list << g.id
           end
           params[:group_id] = group_id_list
           @select_group_id = l(:select_all)
+        elsif params[:group_id].blank?
+          my_group_id_list.each do |mg|
+            group_id_list << mg.group_id
+          end
+          params[:group_id] = group_id_list
+          @select_group_id = ''
         else
           @select_group_id = params[:group_id]
         end

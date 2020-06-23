@@ -2,7 +2,7 @@
 <h2><%= @beginning_of_week.to_s + ' ~ ' + (@next_week - 1).to_s %></h2>
 
 <%= form_with(scope: :search, url: {controller: 'redmine_destination_bbs', action: 'report'}, method: :get, local: true) do |f| %>
-    <%= f.select :group_id, options_for_select(@groups.map{ |group| [group.lastname, group.id]}, @select_group_id), include_blank: l(:select_all) %>
+    <%= f.select :group_id, options_for_select(@groups.map{ |group| [group.lastname, group.id]}.push([l(:select_all), l(:select_all)]), @select_group_id), {prompt: l(:select_my_group)} %>
     <%= f.submit(l(:button_search_group)) %>
 <% end %>
 
