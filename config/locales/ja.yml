@@ -2,6 +2,8 @@
 ja:
   title_destination_bbs: "行先掲示板"
 
+  field_attendance_leaving: "出勤/退勤"
+
   field_user_name: "ユーザー名"
   field_destination: "行先"
   field_start_time: "開始時刻"

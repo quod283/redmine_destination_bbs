@@ -2,6 +2,8 @@
 en:
   title_destination_bbs: "Destination_BBS"
 
+  field_attendance_leaving: "Attendance/Leaving"
+
   field_user_name: "User Name"
   field_destination: "Destination"
   field_start_time: "Start Time"

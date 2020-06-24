@@ -2,6 +2,7 @@
 
 <h2><%= l(:title_destination_bbs) %></h2>
 <h2><%= @search_params_date %></h2>
+
 <% if (@destination_bbs_id.blank?) %>
     <% if (@search_params_date == Date.today.strftime("%Y-%m-%d") || @search_params_date == Date.today) %>
         <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_attendance), user_id: @user_id, start_time: Time.zone.now}} %>
@@ -50,7 +51,8 @@
 
 <table class="list">
     <thead><tr>
-    <th><%=h l(:field_user_name) %></th><th><%=h l(:field_destination) %></th><th><%=h l(:field_start_time) %></th><th><%=h l(:field_end_time) %></th>
+    <th><%=h l(:field_attendance_leaving) %></th><th><%=h l(:field_user_name) %></th><th><%=h l(:field_destination) %></th>
+    <th><%=h l(:field_start_time) %></th><th><%=h l(:field_end_time) %></th>
     <th><%=h l(:field_working_in_place)%></th><th class="comment_header"><%=h l(:field_comments) %></th>
     </tr></thead>
 
@@ -59,6 +61,15 @@
     <% else %>
         <% @destination_bbs.each do |destination_bbs| %>
             <tr class="<%= cycle('odd', 'even') %>">
+            <td><div id="switchArea">
+                <input type="checkbox" id="switch1" 
+                    <% if destination_bbs.destination == l(:button_holiday) || destination_bbs.end_time.present? %>
+                        checked="checked"
+                    <% end %>
+                disabled="disabled">
+                <label for="switch1"><span></span></label>
+                <div id="swImg"></div>
+            </div></td>
             <td><%= @users.find(destination_bbs.user_id) %></td>
             <td><%= destination_bbs.destination %></td>
             <td><%= destination_bbs.start_time.to_time.to_s(:time) if destination_bbs.start_time.present? %></td> 
@@ -72,6 +83,11 @@
     <% else %>
         <% @search_group_users_list_distinct.each do |group_user|%>
             <tr class="<%= cycle('odd', 'even') %>">
+            <td><div id="switchArea">
+                <input type="checkbox" id="switch1" checked="checked" disabled="disabled">
+                <label for="switch1"><span></span></label>
+                <div id="swImg"></div>
+            </div></td>
             <td><%= group_user %></td>
             <td></td>
             <td></td>
