@@ -5,10 +5,10 @@
 
 <% if (@destination_bbs_id.blank?) %>
     <% if (@search_params_date == Date.today.strftime("%Y-%m-%d") || @search_params_date == Date.today) %>
+        <%= button_to l(:button_home), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_home), user_id: @user_id, start_time: Time.zone.now}} %>
         <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_attendance), user_id: @user_id, start_time: Time.zone.now}} %>
         <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_business_trip), user_id: @user_id, start_time: Time.zone.now}} %>
         <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
-        <%= button_to l(:button_home), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_home), user_id: @user_id, start_time: Time.zone.now}} %>
     <% else %>
         <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'create'}, {params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
     <% end %>

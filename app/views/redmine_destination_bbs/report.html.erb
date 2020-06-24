@@ -23,8 +23,12 @@
         <td><%= group_user %></td>
         <td><%= @custom_values.where(customized_id: group_user.id).select('value').first%></td>
         <% (@beginning_of_week...@next_week).each do |date| %>
-            <% @destination_bbs_to_report.where(user_id: group_user.id, registration_date: date).each do |record| %>
-                <td><%= record.destination %></td>
+            <% if  @destination_bbs_to_report.where(user_id: group_user.id, registration_date: date).blank? %>
+                <td></td>
+            <% else %>
+                <% @destination_bbs_to_report.where(user_id: group_user.id, registration_date: date).each do |record| %>
+                    <td><%= record.destination %></td>
+                <% end %>
             <% end %>
         <% end %>
         </tr>
