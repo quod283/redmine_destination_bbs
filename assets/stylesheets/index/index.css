@@ -7,7 +7,6 @@ table.list{
     color: darkslategray;
 }
 
-
 .comment_header {
     width: 40%;
 }
@@ -16,6 +15,24 @@ table.list{
     width: 40%;
 }
 
+#select_date_form {
+    padding-right: 10px;
+    padding-left: 20px;
+}
+
+#comment_form {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+#search_group_form {
+    padding-right: 20px;
+    padding-left: 10px;
+}
+
+#current_user {
+    background-color:mediumaquamarine;
+}
 
  /* === ボタンを表示するエリア ============================== */
 #switchArea {

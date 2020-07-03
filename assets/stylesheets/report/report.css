@@ -1,0 +1,11 @@
+table.list th.today_column {
+    background-color: mediumaquamarine;
+}
+
+.today_column {
+    background-color: mediumaquamarine;
+}
+
+#search_group_form {
+    padding-right: 20px;
+}

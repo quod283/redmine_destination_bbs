@@ -17,7 +17,9 @@ en:
   button_attendance: "出社"
   button_business_trip: "出張"
   button_holiday: "年休"
-  button_registration_date: "Move"
+  button_registration_date: "Moving to Date"
+  button_prev_date: "◀"
+  button_next_date: "▶"
   button_leaving: "退勤"
 
   button_comment_update: "Comment Update"

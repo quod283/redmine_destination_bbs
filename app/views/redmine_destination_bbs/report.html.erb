@@ -1,7 +1,9 @@
+<%= stylesheet_link_tag "report/report.css", :plugin => 'redmine_destination_bbs' %>
+
 <h2><%= l(:button_weekly_information) %></h2>
 <h2><%= @beginning_of_week.to_s + ' ~ ' + (@next_week - 1).to_s %></h2>
 
-<%= form_with(scope: :search, url: {controller: 'redmine_destination_bbs', action: 'report'}, method: :get, local: true) do |f| %>
+<%= form_with(scope: :search, url: {controller: 'redmine_destination_bbs', action: 'report'}, method: :get, local: true, id: "search_group_form") do |f| %>
     <%= f.select :group_id, options_for_select(@groups.map{ |group| [group.lastname, group.id]}.push([l(:select_all), l(:select_all)]), @select_group_id), {prompt: l(:select_my_group)} %>
     <%= f.submit(l(:button_search_group)) %>
 <% end %>
@@ -13,7 +15,7 @@
         <th><%=h l(:field_user_name) %></th>
         <th><%=h l(:field_working_in_place) %>
         <% (@beginning_of_week...@next_week).each do |date| %>
-            <th><%=h date.strftime('%m-%d') + @weekday_list[date.wday] %></th>
+            <th class="<%= "today_column" if date == Date.today %>"><%=h date.strftime('%m-%d') + @weekday_list[date.wday] %></th>
         <% end %>
     </tr></thead>
 
@@ -24,10 +26,10 @@
         <td><%= @custom_values.where(customized_id: group_user.id).select('value').first%></td>
         <% (@beginning_of_week...@next_week).each do |date| %>
             <% if  @destination_bbs_to_report.where(user_id: group_user.id, registration_date: date).blank? %>
-                <td></td>
+                <td class="<%= "today_column" if date == Date.today %>"></td>
             <% else %>
                 <% @destination_bbs_to_report.where(user_id: group_user.id, registration_date: date).each do |record| %>
-                    <td><%= record.destination %></td>
+                    <td class="<%= "today_column" if date == Date.today %>"><%= record.destination %></td>
                 <% end %>
             <% end %>
         <% end %>

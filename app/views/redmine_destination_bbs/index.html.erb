@@ -24,16 +24,18 @@
     <% end %>
 <% end %>
 
-<%= form_with(scope: :search, url:  {controller: 'redmine_destination_bbs', action: 'index'}, method: :get, local: true) do |f| %>
+<%= form_with(scope: :search, url:  {controller: 'redmine_destination_bbs', action: 'index'}, method: :get, local: true, id: "select_date_form") do |f| %>
+    <%= f.submit(l(:button_prev_date))%>
     <%= f.date_field(:registration_date, value: @search_params[:registration_date]) %>
     <%= calendar_for('registration_date') %>
     <%= f.hidden_field(:group_id, value: @select_group_id) %>
+    <%= f.submit(l(:button_next_date))%>
     <%= f.submit(l(:button_registration_date)) %>
 <% end %>
 
 <% if (@destination_bbs_id.blank?) %>
 <% else %>
-    <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, method: :put, local: true) do |f| %>
+    <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, method: :put, local: true, id: "comment_form") do |f| %>
         <%= f.text_field(:comment, placeholder: l(:filed_comment_input_field), :size => 80) %>
         <%= f.hidden_field(:user_id, value: @user_id) %>
         <%= f.hidden_field(:registration_date, value: @search_params_date) %>
@@ -41,7 +43,7 @@
     <% end %>
 <% end %>
 
-<%= form_with(scope: :search, url: {controller: 'redmine_destination_bbs', action: 'index'}, method: :get, local: true) do |f| %>
+<%= form_with(scope: :search, url: {controller: 'redmine_destination_bbs', action: 'index'}, method: :get, local: true, id: "search_group_form") do |f| %>
     <%= f.select :group_id, options_for_select(@groups.map{ |group| [group.lastname, group.id]}.push([l(:select_all), l(:select_all)]), @select_group_id), {prompt: l(:select_my_group)} %>
     <%= f.hidden_field(:registration_date, value: @search_params_date) %>
     <%= f.submit(l(:button_search_group)) %>
@@ -60,13 +62,17 @@
     <% if (@destination_bbs.blank?) %>
     <% else %>
         <% @destination_bbs.each do |destination_bbs| %>
-            <tr class="<%= cycle('odd', 'even') %>">
+            <tr id="<%= "current_user" if destination_bbs.user_id == @user_id %>" class="<%= cycle('odd', 'even') %>" >
             <td><div id="switchArea">
                 <input type="checkbox" id="switch1" 
                     <% if destination_bbs.destination == l(:button_holiday) || destination_bbs.end_time.present? %>
                         checked="checked"
                     <% end %>
-                disabled="disabled">
+                    <% if @user_id == destination_bbs.user_id %>
+                        >
+                    <% else %>
+                        disabled="disabled">
+                    <% end %>
                 <label for="switch1"><span></span></label>
                 <div id="swImg"></div>
             </div></td>
@@ -82,7 +88,7 @@
     <% if (@search_group_users_list_distinct.blank?)%>
     <% else %>
         <% @search_group_users_list_distinct.each do |group_user|%>
-            <tr class="<%= cycle('odd', 'even') %>">
+            <tr id="<%= "current_user" if group_user.id == @user_id %>" class="<%= cycle('odd', 'even') %>">
             <td><div id="switchArea">
                 <input type="checkbox" id="switch1" checked="checked" disabled="disabled">
                 <label for="switch1"><span></span></label>

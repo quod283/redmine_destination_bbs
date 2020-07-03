@@ -57,6 +57,7 @@ class RedmineDestinationBbsController < ApplicationController
           end
           group_user_id_list.uniq!
         end
+
         # 日付欄が空欄の場合(初期表示時)は表示時点の日付データを取得する
         if @search_params[:registration_date].blank?
           if params[:registration_date].blank?
@@ -64,11 +65,13 @@ class RedmineDestinationBbsController < ApplicationController
             @search_params[:registration_date] = Date.today
             @search_params_date = Date.today
           else
+            params[:registration_date] = Date.strptime(params[:registration_date], '%Y-%m-%d') + check_date_move
             @destination_bbs = RedmineDestinationBbsModel.where(registration_date:  params[:registration_date], user_id: group_user_id_list)
             @search_params[:registration_date] = params[:registration_date]
             @search_params_date = params[:registration_date]
           end
         else
+          @search_params[:registration_date] = Date.strptime(@search_params[:registration_date], '%Y-%m-%d') + check_date_move
           @destination_bbs = RedmineDestinationBbsModel.search(@search_params).where(user_id: group_user_id_list)
           @search_params_date = @search_params[:registration_date]
         end
@@ -318,6 +321,22 @@ class RedmineDestinationBbsController < ApplicationController
   def get_working_in_place
     custom_field_id = CustomField.where(name: "在勤地").select('id')
     CustomValue.where(customized_type: 'Principal', custom_field_id: custom_field_id).select('customized_id', 'value')
+  end
+
+  
+  def check_date_move
+      # 日付移動判定
+      if params[:commit].blank?
+        return 0
+      else
+        if params[:commit] == l(:button_prev_date)
+          return -1
+        elsif params[:commit] == l(:button_next_date)
+          return 1
+        else
+          return 0
+        end
+      end
   end
 
   # 日付指定時の検索用関数
