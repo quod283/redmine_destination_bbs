@@ -76,6 +76,9 @@ class RedmineDestinationBbsController < ApplicationController
           @search_params_date = @search_params[:registration_date]
         end
 
+        # 曜日出力用
+        @weekday_list = %w((日) (月) (火) (水) (木) (金) (土)) 
+
         # 本人登録済レコードのID取得
         @destination_bbs_id = RedmineDestinationBbsModel.where(user_id: @user_id, registration_date: @search_params[:registration_date]).select('id')
         # グループユーザー一覧表示用

@@ -1,7 +1,7 @@
 <%= stylesheet_link_tag "index/index.css", :plugin => 'redmine_destination_bbs' %>
 
 <h2><%= l(:title_destination_bbs) %></h2>
-<h2><%= @search_params_date %></h2>
+<h2><%= @search_params_date %><%= @weekday_list[@search_params_date.wday]%></h2>
 
 <% if (@destination_bbs_id.blank?) %>
     <% if (@search_params_date == Date.today.strftime("%Y-%m-%d") || @search_params_date == Date.today) %>
