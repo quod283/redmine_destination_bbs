@@ -20,7 +20,10 @@ ja:
   button_registration_date: "日付に移動"
   button_prev_date: "◀"
   button_next_date: "▶"
+  button_to_current_day: "今日へ移動"
   button_leaving: "退勤"
+
+
 
   button_comment_update: "コメント更新"
   button_csv_download: "CSV出力"

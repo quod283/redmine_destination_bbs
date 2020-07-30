@@ -20,6 +20,7 @@ en:
   button_registration_date: "Moving to Date"
   button_prev_date: "◀"
   button_next_date: "▶"
+  button_to_current_day: "Moving to Current Day"
   button_leaving: "退勤"
 
   button_comment_update: "Comment Update"

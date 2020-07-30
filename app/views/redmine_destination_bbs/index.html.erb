@@ -16,7 +16,7 @@
     <% if (@search_params_date == Date.today.strftime("%Y-%m-%d") || @search_params_date == Date.today) %>
         <%= button_to l(:button_home), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_home), user_id: @user_id}} %>
         <%= button_to l(:button_attendance), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_attendance), user_id: @user_id}} %>
-        <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_business_trip), user_id: @user_id}} %>    
+        <%= button_to l(:button_business_trip), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_business_trip), user_id: @user_id}} %>
         <%= button_to l(:button_holiday), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_holiday), user_id: @user_id, registration_date: @search_params_date}} %>
         <%= button_to l(:button_leaving), {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, {method: :put, params: {destination: l(:button_leaving), user_id: @user_id, end_time: Time.zone.now}} %>
     <% else %>
@@ -31,6 +31,15 @@
     <%= f.hidden_field(:group_id, value: @select_group_id) %>
     <%= f.submit(l(:button_next_date))%>
     <%= f.submit(l(:button_registration_date)) %>
+<% end %>
+
+<% if (@search_params_date == Date.today.strftime("%Y-%m-%d") || @search_params_date == Date.today) %>
+<% else %>
+    <%= form_with(scope: :search, url:  {controller: 'redmine_destination_bbs', action: 'index'}, method: :get, local: true, id: "moving_to_current_day") do |f| %>
+        <%= f.hidden_field(:registration_date, value: Date.today) %>
+        <%= f.hidden_field(:group_id, value: @select_group_id) %>
+        <%= f.submit(l(:button_to_current_day)) %>
+    <% end %>
 <% end %>
 
 <% if (@destination_bbs_id.blank?) %>
@@ -64,7 +73,7 @@
         <% @destination_bbs.each do |destination_bbs| %>
             <tr id="<%= "current_user" if destination_bbs.user_id == @user_id %>" class="<%= cycle('odd', 'even') %>" >
             <td><div id="switchArea">
-                <input type="checkbox" id="switch1" 
+                <input type="checkbox" id="switch1"
                     <% if destination_bbs.destination == l(:button_holiday) || destination_bbs.end_time.present? %>
                         checked="checked"
                     <% end %>
@@ -78,7 +87,7 @@
             </div></td>
             <td><%= @users.find(destination_bbs.user_id) %></td>
             <td><%= destination_bbs.destination %></td>
-            <td><%= destination_bbs.start_time.to_time.to_s(:time) if destination_bbs.start_time.present? %></td> 
+            <td><%= destination_bbs.start_time.to_time.to_s(:time) if destination_bbs.start_time.present? %></td>
             <td><%= destination_bbs.end_time.to_time.to_s(:time)  if destination_bbs.end_time.present? %></td>
             <td><%= @custom_values.where(customized_id: destination_bbs.user_id).select('value').first %></td>
             <td class="comment_body"><%= destination_bbs.comment %></td>
