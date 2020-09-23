@@ -22,6 +22,9 @@ en:
   button_next_date: "▶"
   button_to_current_day: "Moving to Current Day"
   button_leaving: "退勤"
+  button_planned_paid_holiday: "計年"
+  button_refresh_leave: "リフ休"
+
 
   button_comment_update: "Comment Update"
   button_csv_download: "CSV Download"

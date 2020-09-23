@@ -77,7 +77,7 @@ class RedmineDestinationBbsController < ApplicationController
         end
 
         # 曜日出力用
-        @weekday_list = %w((日) (月) (火) (水) (木) (金) (土)) 
+        @weekday_list = %w((日) (月) (火) (水) (木) (金) (土))
 
         # 本人登録済レコードのID取得
         @destination_bbs_id = RedmineDestinationBbsModel.where(user_id: @user_id, registration_date: @search_params[:registration_date]).select('id')
@@ -156,13 +156,13 @@ class RedmineDestinationBbsController < ApplicationController
     @destination_bbs.user_id = params[:user_id]
     @destination_bbs.destination = params[:destination]
     # 年休ボタン押下時のみ当日以外の登録可能
-    if params[:destination] == l(:button_holiday)
+    if params[:destination] == l(:button_holiday) || params[:destination] == l(:button_planned_paid_holiday) || params[:destination] == l(:button_refresh_leave)
       @destination_bbs.registration_date = params[:registration_date]
     else
       @destination_bbs.registration_date = Date.today
-      @destination_bbs.start_time = params[:start_time]
+      @destination_bbs.start_time = Time.zone.now
     end
-    
+
     if @destination_bbs.save
       flash[:notice] = l(:notice_successful_create)
       move_to_index
@@ -180,7 +180,7 @@ class RedmineDestinationBbsController < ApplicationController
       end
     else
       # 行先確認(年休の場合当日以外も登録可)
-      if params[:destination] == l(:button_holiday)
+      if params[:destination] == l(:button_holiday) || params[:destination] == l(:button_planned_paid_holiday) || params[:destination] == l(:button_refresh_leave)
         @destination_bbs = RedmineDestinationBbsModel.where(user_id: params[:user_id], registration_date: params[:registration_date])
         destination_bbs = RedmineDestinationBbsModel.where(user_id: params[:user_id], registration_date: params[:registration_date]).first
       else
@@ -195,7 +195,7 @@ class RedmineDestinationBbsController < ApplicationController
       else
         # 退勤ボタンを押した時のみ終了時刻を更新
         if params[:end_time].present?
-          if @destination_bbs.update(end_time: params[:end_time])
+          if @destination_bbs.update(end_time: Time.zone.now)
             flash[:notice] = l(:notice_successful_update)
             move_to_index
           end
@@ -326,7 +326,7 @@ class RedmineDestinationBbsController < ApplicationController
     CustomValue.where(customized_type: 'Principal', custom_field_id: custom_field_id).select('customized_id', 'value')
   end
 
-  
+
   def check_date_move
       # 日付移動判定
       if params[:commit].blank?
