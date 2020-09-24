@@ -25,6 +25,14 @@ class RedmineDestinationBbsController < ApplicationController
     # Myグループid取得
     my_group_id_list = User.joins(:groups).where(users_groups_users_join: { user_id: @user_id}).select('group_id')
 
+    # 出社場所リスト取得
+    attendance_location_list = AttendanceLocation.all.first
+    if attendance_location_list.blank?
+      @attendance_location_list = []
+    else
+      @attendance_location_list = attendance_location_list.location_list.split(/\R/)
+    end
+
 
     # フォーマット毎に処理を分ける
     respond_to do |format|
@@ -178,6 +186,13 @@ class RedmineDestinationBbsController < ApplicationController
         flash[:notice] = l(:notice_successful_update)
         move_to_index
       end
+    elsif params[:attendance_location].present?
+      @destination_bbs = RedmineDestinationBbsModel.where(user_id: params[:user_id], registration_date: params[:registration_date])
+      # 出社場所更新時は出社場所のみ更新
+      if @destination_bbs.update(attendance_location: params[:attendance_location])
+        flash[:notice] = l(:notice_successful_update)
+        move_to_index
+      end
     else
       # 行先確認(年休の場合当日以外も登録可)
       if params[:destination] == l(:button_holiday) || params[:destination] == l(:button_planned_paid_holiday) || params[:destination] == l(:button_refresh_leave)
@@ -189,26 +204,27 @@ class RedmineDestinationBbsController < ApplicationController
         destination_bbs = RedmineDestinationBbsModel.where(user_id: params[:user_id], registration_date: Date.today).first
       end
 
-      # コメント空欄時に更新ボタンを押した場合は何も更新しない
-      if params[:destination].blank?
+
+      # 退勤ボタンを押した時のみ終了時刻を更新
+      if params[:end_time].present?
+        if @destination_bbs.update(end_time: Time.zone.now)
+          flash[:notice] = l(:notice_successful_update)
+          move_to_index
+        end
+      elsif destination_bbs.start_time.blank? && (params[:destination] != l(:button_holiday) || params[:destination] != l(:button_planned_paid_holiday) || params[:destination] != l(:button_refresh_leave))
+        # 年休・計年・リフ休でない行先を登録した場合は開始時刻も更新
+        if @destination_bbs.update(destination: params[:destination], start_time: Time.zone.now)
+          flash[:notice] = l(:notice_successful_update)
+          move_to_index
+        end
+      elsif params[:destination].blank?
+        # コメント空欄時に更新ボタンを押した場合は何も更新しない
         move_to_index
       else
-        # 退勤ボタンを押した時のみ終了時刻を更新
-        if params[:end_time].present?
-          if @destination_bbs.update(end_time: Time.zone.now)
-            flash[:notice] = l(:notice_successful_update)
-            move_to_index
-          end
-        elsif destination_bbs.start_time.blank? && params[:destination] != l(:button_holiday)
-          if @destination_bbs.update(destination: params[:destination], start_time: Time.zone.now)
-            flash[:notice] = l(:notice_successful_update)
-            move_to_index
-          end
-        else
-          if @destination_bbs.update(destination: params[:destination])
-            flash[:notice] = l(:notice_successful_update)
-            move_to_index
-          end
+        # 上記以外は行先のみ更新
+        if @destination_bbs.update(destination: params[:destination])
+          flash[:notice] = l(:notice_successful_update)
+          move_to_index
         end
       end
     end

@@ -15,6 +15,11 @@ table.list{
     width: 40%;
 }
 
+#attendance_location {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
 #select_date_form {
     padding-right: 10px;
     padding-left: 20px;

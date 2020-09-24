@@ -1,6 +1,7 @@
 # English strings go here for Rails i18n
 en:
   title_destination_bbs: "Destination_BBS"
+  title_attendance_location_list: "Set Attendance Location List(Destination_BBS Plugin)"
 
   field_attendance_leaving: "Attendance/Leaving"
 
@@ -12,6 +13,7 @@ en:
 
   field_working_in_place: "Working in Place"
   filed_comment_input_field: "Comment Input Field"
+  field_attendance_location: "Attendance Location"
 
   button_home: "在宅"
   button_attendance: "出社"
@@ -25,7 +27,7 @@ en:
   button_planned_paid_holiday: "計年"
   button_refresh_leave: "リフ休"
 
-
+  button_attendance_location_update: "Attendance Location Update"
   button_comment_update: "Comment Update"
   button_csv_download: "CSV Download"
 

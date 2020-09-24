@@ -1,6 +1,7 @@
 # Japanese translations for Ruby on Rails
 ja:
   title_destination_bbs: "行先掲示板"
+  title_attendance_location_list: "出社場所リスト(行先掲示板プラグイン)"
 
   field_attendance_leaving: "出勤/退勤"
 
@@ -12,6 +13,7 @@ ja:
 
   field_working_in_place: "在勤地"
   filed_comment_input_field: "コメント入力欄"
+  field_attendance_location: "出社場所"
 
   button_home: "在宅"
   button_attendance: "出社"
@@ -26,7 +28,7 @@ ja:
   button_refresh_leave: "リフ休"
 
 
-
+  button_attendance_location_update: "出社場所更新"
   button_comment_update: "コメント更新"
   button_csv_download: "CSV出力"
 

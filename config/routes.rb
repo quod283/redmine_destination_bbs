@@ -6,4 +6,9 @@ Rails.application.routes.draw do
             get 'report'
         end
     end
+
+    resources :attendance_location do
+        collection do
+        end
+    end
 end

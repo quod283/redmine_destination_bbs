@@ -1,0 +1,17 @@
+<h2><%= l(:title_attendance_location_list) %></h2>
+
+<p>
+    <% if (@attendance_location_list.blank?) %>
+        <%= form_with(url: {controller: 'attendance_location', action: 'create'}, method: :post, local: true, id: "attendance_location_form") do |f| %>
+            <%= f.text_area :location_list, :rows => 15 %>
+            <em class="info"><%= l(:text_custom_field_possible_values_info) %></em>
+            <%= f.submit(l(:button_save)) %>
+        <% end %>
+    <% else %>
+        <%= form_with(url: {controller: 'attendance_location', action: 'update', id: @attendance_location_list_id}, method: :put, local: true, id: "attendance_location_form") do |f| %>
+            <%= f.text_area :location_list, :value => @attendance_location_list.location_list, :rows => 15 %>
+            <em class="info"><%= l(:text_custom_field_possible_values_info) %></em>
+            <%= f.submit(l(:button_save)) %>
+        <% end %>
+    <% end %>
+</p>
