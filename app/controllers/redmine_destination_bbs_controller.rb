@@ -193,6 +193,13 @@ class RedmineDestinationBbsController < ApplicationController
         flash[:notice] = l(:notice_successful_update)
         move_to_index
       end
+    elsif params[:condition].present?
+      @destination_bbs = RedmineDestinationBbsModel.where(user_id: params[:user_id], registration_date: params[:registration_date])
+      # 体調更新時は体調と体温のみ更新
+      if @destination_bbs.update(condition: params[:condition], body_temperature: params[:body_temperature])
+        flash[:notice] = l(:notice_successful_update)
+        move_to_index
+      end
     else
       # 行先確認(年休の場合当日以外も登録可)
       if params[:destination] == l(:button_holiday) || params[:destination] == l(:button_planned_paid_holiday) || params[:destination] == l(:button_refresh_leave)
@@ -211,7 +218,9 @@ class RedmineDestinationBbsController < ApplicationController
           flash[:notice] = l(:notice_successful_update)
           move_to_index
         end
-      elsif destination_bbs.start_time.blank? && (params[:destination] != l(:button_holiday) || params[:destination] != l(:button_planned_paid_holiday) || params[:destination] != l(:button_refresh_leave))
+      elsif (destination_bbs.start_time.blank? && params[:destination] != l(:button_holiday) ) &&
+            (destination_bbs.start_time.blank? && params[:destination] != l(:button_planned_paid_holiday)) &&
+            (destination_bbs.start_time.blank? && params[:destination] != l(:button_refresh_leave))
         # 年休・計年・リフ休でない行先を登録した場合は開始時刻も更新
         if @destination_bbs.update(destination: params[:destination], start_time: Time.zone.now)
           flash[:notice] = l(:notice_successful_update)
@@ -226,6 +235,16 @@ class RedmineDestinationBbsController < ApplicationController
           flash[:notice] = l(:notice_successful_update)
           move_to_index
         end
+      end
+    end
+  end
+
+  def destroy
+    destination_bbs_id = RedmineDestinationBbsModel.where(user_id: params[:user_id], registration_date: params[:registration_date]).first.id
+    if destination_bbs_id.present?
+      if RedmineDestinationBbsModel.destroy(destination_bbs_id)
+        flash[:notice] = l(:notice_successful_delete)
+        move_to_index
       end
     end
   end

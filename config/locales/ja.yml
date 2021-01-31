@@ -15,6 +15,10 @@ ja:
   filed_comment_input_field: "コメント入力欄"
   field_attendance_location: "出社場所"
 
+  field_condition: "体調"
+  field_body_temperature: "体温"
+  filed_body_temperature_input_field: "体温入力欄"
+
   button_home: "在宅"
   button_attendance: "出社"
   button_business_trip: "出張"
@@ -27,6 +31,9 @@ ja:
   button_planned_paid_holiday: "計年"
   button_refresh_leave: "リフ休"
 
+  button_condition_update: "体調情報更新"
+
+  button_record_destroy: "取り消し"
 
   button_attendance_location_update: "出社場所更新"
   button_comment_update: "コメント更新"

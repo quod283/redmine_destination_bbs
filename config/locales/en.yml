@@ -15,6 +15,10 @@ en:
   filed_comment_input_field: "Comment Input Field"
   field_attendance_location: "Attendance Location"
 
+  field_condition: "Condition"
+  field_body_temperature: "Body Temperature"
+  filed_body_temperature_input_field: "Body Temperature Input Field"
+
   button_home: "在宅"
   button_attendance: "出社"
   button_business_trip: "出張"
@@ -26,6 +30,10 @@ en:
   button_leaving: "退勤"
   button_planned_paid_holiday: "計年"
   button_refresh_leave: "リフ休"
+
+  button_condition_update: "Condition Update"
+
+  button_record_destroy: "Delete"
 
   button_attendance_location_update: "Attendance Location Update"
   button_comment_update: "Comment Update"

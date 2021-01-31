@@ -3,6 +3,8 @@ api.array :destination_bbses do
     api.destination_bbs do
       api.user_id           destination_bbs.user_id unless destination_bbs.user_id.nil?
       api.destination       destination_bbs.destination unless destination_bbs.destination.nil?
+      api.condition         destination_bbs.condition unless destination_bbs.condition.nil?
+      api.body_temperature  destination_bbs.body_temperature unless destination_bbs.body_temperature.nil?
       api.registration_date destination_bbs.registration_date unless destination_bbs.registration_date.nil?
       api.start_time        destination_bbs.start_time unless destination_bbs.start_time.nil?
       api.end_time          destination_bbs.end_time unless destination_bbs.end_time.nil?

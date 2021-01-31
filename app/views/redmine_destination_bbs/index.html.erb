@@ -35,6 +35,18 @@
 
 <% if (@destination_bbs_id.blank?) %>
 <% else %>
+    <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, method: :put, local: true, id: "condition") do |f| %>
+        <%= f.label :name, l(:field_condition)%>
+        <%= f.select :condition, options_for_select(["良好", "不良"], "良好") %>
+        <%= f.text_field(:body_temperature, placeholder: l(:filed_body_temperature_input_field), :size => 10) %>
+        <%= f.hidden_field(:user_id, value: @user_id) %>
+        <%= f.hidden_field(:registration_date, value: @search_params_date) %>
+        <%= f.submit(l(:button_condition_update)) %>
+    <% end %>
+<% end %>
+
+<% if (@destination_bbs_id.blank?) %>
+<% else %>
     <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, method: :put, local: true, id: "attendance_location") do |f| %>
         <%= f.select :attendance_location, options_for_select(@attendance_location_list.map{ |attendance_location_list| [attendance_location_list, attendance_location_list]}, @custom_values), {prompt: ""} %>
         <%= f.hidden_field(:user_id, value: @user_id) %>
@@ -61,10 +73,12 @@
     <% end %>
 <% end %>
 
+<div></div>
+
 <% if (@destination_bbs_id.blank?) %>
 <% else %>
     <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'update', id: @destination_bbs_id}, method: :put, local: true, id: "comment_form") do |f| %>
-        <%= f.text_field(:comment, placeholder: l(:filed_comment_input_field), :size => 80) %>
+        <%= f.text_field(:comment, placeholder: l(:filed_comment_input_field), :size => 73) %>
         <%= f.hidden_field(:user_id, value: @user_id) %>
         <%= f.hidden_field(:registration_date, value: @search_params_date) %>
         <%= f.submit(l(:button_comment_update)) %>
@@ -77,9 +91,21 @@
     <%= f.submit(l(:button_search_group)) %>
 <% end %>
 
+
+<% if (@destination_bbs_id.blank?) %>
+<% else %>
+    <%= form_with(url: {controller: 'redmine_destination_bbs', action: 'destroy', id: @destination_bbs_id}, method: :delete, local: true, id: "delete_form") do |f| %>
+        <%= f.hidden_field(:user_id, value: @user_id) %>
+        <%= f.hidden_field(:registration_date, value: @search_params_date) %>
+        <%= f.submit(l(:button_record_destroy)) %>
+    <% end %>
+<% end %>
+
+
 <table class="list">
     <thead><tr>
     <th><%=h l(:field_attendance_leaving) %></th><th><%=h l(:field_user_name) %></th><th><%=h l(:field_destination) %></th>
+    <th><%=h l(:field_condition)%></th><th><%=h l(:field_body_temperature) %></th>
     <th><%=h l(:field_start_time) %></th><th><%=h l(:field_end_time) %></th>
     <th><%=h l(:field_working_in_place)%></th><th><%=h l(:field_attendance_location)%></th><th class="comment_header"><%=h l(:field_comments) %></th>
     </tr></thead>
@@ -91,7 +117,7 @@
             <tr id="<%= "current_user" if destination_bbs.user_id == @user_id %>" class="<%= cycle('odd', 'even') %>" >
             <td><div id="switchArea">
                 <input type="checkbox" id="switch1"
-                    <% if destination_bbs.destination == l(:button_holiday) || destination_bbs.end_time.present? %>
+                    <% if destination_bbs.destination == l(:button_holiday) || destination_bbs.destination == l(:button_planned_paid_holiday) || destination_bbs.destination == l(:button_refresh_leave) || destination_bbs.end_time.present? %>
                         checked="checked"
                     <% end %>
                     <% if @user_id == destination_bbs.user_id %>
@@ -104,6 +130,8 @@
             </div></td>
             <td><%= @users.find(destination_bbs.user_id) %></td>
             <td><%= destination_bbs.destination %></td>
+            <td><%= destination_bbs.condition %></td>
+            <td><%= destination_bbs.body_temperature %></td>
             <td><%= destination_bbs.start_time.to_time.to_s(:time) if destination_bbs.start_time.present? %></td>
             <td><%= destination_bbs.end_time.to_time.to_s(:time)  if destination_bbs.end_time.present? %></td>
             <td><%= @custom_values.where(customized_id: destination_bbs.user_id).select('value').first %></td>
@@ -122,6 +150,8 @@
                 <div id="swImg"></div>
             </div></td>
             <td><%= group_user %></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
