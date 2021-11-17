@@ -169,6 +169,9 @@ class RedmineDestinationBbsController < ApplicationController
     else
       @destination_bbs.registration_date = Date.today
       @destination_bbs.start_time = Time.zone.now
+      # 体調と体温はデフォルト値を良好/平熱とする
+      @destination_bbs.condition = "良好"
+      @destination_bbs.body_temperature = "平熱"
     end
 
     if @destination_bbs.save
