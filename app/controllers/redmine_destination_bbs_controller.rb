@@ -172,6 +172,14 @@ class RedmineDestinationBbsController < ApplicationController
       # 体調と体温はデフォルト値を良好/平熱とする
       @destination_bbs.condition = "良好"
       @destination_bbs.body_temperature = "平熱"
+      # 行先が出社の場合デフォルトの出社先を在勤地と同値とする
+      if params[:destination] == l(:button_attendance)
+        # 登録用ユーザの在勤地取得
+        custom_values = get_working_in_place
+        working_in_place = custom_values.where(customized_id: params[:user_id]).select('value').first
+        @destination_bbs.attendance_location = working_in_place
+      end
+
     end
 
     if @destination_bbs.save
@@ -233,10 +241,21 @@ class RedmineDestinationBbsController < ApplicationController
         # コメント空欄時に更新ボタンを押した場合は何も更新しない
         move_to_index
       else
-        # 上記以外は行先のみ更新
-        if @destination_bbs.update(destination: params[:destination])
-          flash[:notice] = l(:notice_successful_update)
-          move_to_index
+        # 行先が出社だった場合は出社場所を在勤地と同じ値に更新する
+        if params[:destination] == l(:button_attendance)
+          # 登録用ユーザの在勤地取得
+          custom_values = get_working_in_place
+          working_in_place = custom_values.where(customized_id: params[:user_id]).select('value').first
+          if @destination_bbs.update(destination: params[:destination], attendance_location: working_in_place)
+            flash[:notice] = l(:notice_successful_update)
+            move_to_index
+          end
+        else
+          # 上記以外は行先のみ更新(出社場所は空欄に更新する)
+          if @destination_bbs.update(destination: params[:destination], attendance_location: '')
+            flash[:notice] = l(:notice_successful_update)
+            move_to_index
+          end
         end
       end
     end
