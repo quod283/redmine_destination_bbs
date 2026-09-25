@@ -1,5 +1,4 @@
 class RedmineDestinationBbsController < ApplicationController
-  unloadable
   accept_api_auth :index
 
   def index
@@ -23,8 +22,8 @@ class RedmineDestinationBbsController < ApplicationController
     @user_id = User.current.attributes["id"]
 
     # Myグループid取得
-    my_group_id_list = User.joins(:groups).where(users_groups_users_join: { user_id: @user_id}).select('group_id')
-
+    # my_group_id_list = User.joins(:groups).where(users_groups_users_join: { user_id: @user_id}).select('group_id')
+    my_group_id_list = User.current.groups.select(:id)
     # 出社場所リスト取得
     attendance_location_list = AttendanceLocation.all.first
     if attendance_location_list.blank?
@@ -48,7 +47,7 @@ class RedmineDestinationBbsController < ApplicationController
         # 初期表示時またはMyグループ選択時
         elsif @search_params[:group_id].blank?
           my_group_id_list.each do |mg|
-            group_id_list << mg.group_id
+            group_id_list << mg.id
           end
           @search_params[:group_id] = group_id_list
           @select_group_id = ''
@@ -56,7 +55,8 @@ class RedmineDestinationBbsController < ApplicationController
           @select_group_id = @search_params[:group_id]
         end
         # グループ検索用
-        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: @search_params[:group_id]}) if @search_params[:group_id].present?
+        # @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: @search_params[:group_id]}) if @search_params[:group_id].present?
+        @search_group_users = User.joins(:groups).where(groups: { id: @search_params[:group_id] }) if @search_params[:group_id].present?
         group_user_id_list = []
         if @search_group_users.blank?
         else
@@ -95,6 +95,13 @@ class RedmineDestinationBbsController < ApplicationController
         else
           @search_group_users_list = get_group_user_list(@destination_bbs)
           @search_group_users_list_distinct = @search_group_users_list.select('id', 'lastname', 'firstname').distinct
+          # 登録済みのユーザーIDを配列で取得（空の場合を考慮して .to_a を付ける）
+          registered_user_ids = @destination_bbs.pluck(:user_id).compact.to_a
+
+          # 登録済みのIDを除外する
+          if registered_user_ids.any?
+            @search_group_users_list_distinct = @search_group_users_list_distinct.where.not(id: registered_user_ids)
+          end
         end
       end
       format.csv do
@@ -108,7 +115,7 @@ class RedmineDestinationBbsController < ApplicationController
           @select_group_id = l(:select_all)
         elsif params[:group_id].blank?
           my_group_id_list.each do |mg|
-            group_id_list << mg.group_id
+            group_id_list << mg.id
           end
           params[:group_id] = group_id_list
           @select_group_id = ''
@@ -116,7 +123,8 @@ class RedmineDestinationBbsController < ApplicationController
           @select_group_id = params[:group_id]
         end
         # グループ検索用
-        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: params[:group_id]}) if params[:group_id].present?
+        # @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: params[:group_id]}) if params[:group_id].present?
+        @search_group_users = User.joins(:groups).where(groups: { id: params[:group_id] }) if params[:group_id].present?
         group_user_id_list = []
         if @search_group_users.blank?
         else
@@ -145,6 +153,13 @@ class RedmineDestinationBbsController < ApplicationController
         else
           @search_group_users_list = get_group_user_list(@destination_bbs)
           @search_group_users_list_distinct = @search_group_users_list.select('id', 'lastname', 'firstname').distinct
+          # 登録済みのユーザーIDを配列で取得（空の場合を考慮して .to_a を付ける）
+          registered_user_ids = @destination_bbs.pluck(:user_id).compact.to_a
+
+          # 登録済みのIDを除外する
+          if registered_user_ids.any?
+            @search_group_users_list_distinct = @search_group_users_list_distinct.where.not(id: registered_user_ids)
+          end
         end
         send_data render_to_string, filename: "destination_bbs.csv", type: :csv
       end
@@ -160,9 +175,23 @@ class RedmineDestinationBbsController < ApplicationController
   end
 
   def create
+    # ログ出力の追加
+    Rails.logger.info "DEBUG: Create action triggered. Params: #{params.inspect}"
     @destination_bbs = RedmineDestinationBbsModel.new(params[:destination_bbs])
     @destination_bbs.user_id = params[:user_id]
     @destination_bbs.destination = params[:destination]
+    # # パラメータが空でないかチェック
+    # if params[:destination_bbs].blank?
+    #   flash[:error] = "入力内容が空です。"
+    #   move_to_index and return
+    # end
+    # 同一ユーザーによる重複登録をチェック (例: 同じ日付の登録があるか)
+    # ※ 既に登録がある場合はエラーを返す、または上書きする処理
+    existing = RedmineDestinationBbsModel.find_by(user_id: params[:user_id], registration_date: Date.today)
+    if existing
+      flash[:error] = "本日の登録は既に完了しています。"
+      move_to_index and return
+    end
     # 年休ボタン押下時のみ当日以外の登録可能
     if params[:destination] == l(:button_holiday) || params[:destination] == l(:button_planned_paid_holiday) || params[:destination] == l(:button_refresh_leave)
       @destination_bbs.registration_date = params[:registration_date]
@@ -292,7 +321,8 @@ class RedmineDestinationBbsController < ApplicationController
     # ログインユーザーIDの取得
     @user_id = User.current.attributes["id"]
     # Myグループid取得
-    my_group_id_list = User.joins(:groups).where(users_groups_users_join: { user_id: @user_id}).select('group_id')
+    # my_group_id_list = User.joins(:groups).where(users_groups_users_join: { user_id: @user_id}).select('group_id')
+    my_group_id_list = User.current.groups.select(:id)
 
     respond_to do |format|
       format.html do
@@ -306,7 +336,7 @@ class RedmineDestinationBbsController < ApplicationController
           @select_group_id = l(:select_all)
         elsif @search_params[:group_id].blank?
           my_group_id_list.each do |mg|
-            group_id_list << mg.group_id
+            group_id_list << mg.id
           end
           @search_params[:group_id] = group_id_list
           @select_group_id = ''
@@ -314,10 +344,12 @@ class RedmineDestinationBbsController < ApplicationController
           @select_group_id = @search_params[:group_id]
         end
         # グループ検索用
-        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: @search_params[:group_id] }) if @search_params[:group_id].present?
+        # @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: @search_params[:group_id] }) if @search_params[:group_id].present?
+        @search_group_users = User.joins(:groups).where(groups: { id: params[:group_id] }) if params[:group_id].present?
         # グループユーザー一覧表示用
         group_user_id_list = []
         if @search_group_users.blank?
+          @search_group_users_distinct = User.none 
         else
           @search_group_users.each do |group_user|
             group_user_id_list << group_user.id
@@ -338,7 +370,7 @@ class RedmineDestinationBbsController < ApplicationController
           @select_group_id = l(:select_all)
         elsif params[:group_id].blank?
           my_group_id_list.each do |mg|
-            group_id_list << mg.group_id
+            group_id_list << mg.id
           end
           params[:group_id] = group_id_list
           @select_group_id = ''
@@ -346,10 +378,12 @@ class RedmineDestinationBbsController < ApplicationController
           @select_group_id = params[:group_id]
         end
         # グループ検索用
-        @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: params[:group_id] }) if params[:group_id].present?
+        # @search_group_users = User.joins(:groups).where(users_groups_users_join: { group_id: params[:group_id] }) if params[:group_id].present?
+        @search_group_users = User.joins(:groups).where(groups: { id: params[:group_id] }) if params[:group_id].present?
         # グループユーザー一覧表示用
         group_user_id_list = []
         if @search_group_users.blank?
+          @search_group_users_distinct = User.none 
         else
           @search_group_users.each do |group_user|
             group_user_id_list << group_user.id
@@ -405,3 +439,5 @@ class RedmineDestinationBbsController < ApplicationController
   end
 
 end
+
+

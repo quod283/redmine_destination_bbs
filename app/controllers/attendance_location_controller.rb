@@ -1,6 +1,4 @@
 class AttendanceLocationController < ApplicationController
-    unloadable
-
     def index
         @attendance_location_list = AttendanceLocation.all.first
         if @attendance_location_list.blank?

@@ -1,6 +1,4 @@
 class RedmineDestinationBbsModel < ActiveRecord::Base
-    unloadable
-
     scope :search, -> (search_params) do
         return if search_params.blank?
 

@@ -7,12 +7,12 @@ CSV.generate(bom) do |csv|
     csv << column_names
     @destination_bbs.each do |destination_bbs|
         if destination_bbs.start_time.present?
-            start_time = destination_bbs.start_time.to_time.to_s(:time)
+            start_time = destination_bbs.start_time.to_time.strftime("%H:%M")
         else
             start_time = ''
         end
         if destination_bbs.end_time.present?
-            end_time = destination_bbs.end_time.to_time.to_s(:time)
+            end_time = destination_bbs.end_time.to_time.strftime("%H:%M")
         else
             end_time = ''
         end
